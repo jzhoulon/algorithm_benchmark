@@ -1,0 +1,18 @@
+SET(TARGET_NAME ${LIB_NAME})
+
+file(GLOB_RECURSE HEADERS
+    ${CMAKE_CURRENT_SOURCE_DIR}/../include/*.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/../include/*.hpp
+    )
+file(GLOB_RECURSE SOURCES
+    ${CMAKE_CURRENT_SOURCE_DIR}/*.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/*.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/*.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/*.hpp)
+
+include_directories(
+    ${CMAKE_CURRENT_SOURCE_DIR}
+    ${CMAKE_CURRENT_SOURCE_DIR}/util
+)
+
+add_library(${TARGET_NAME})

@@ -1,0 +1,12 @@
+#IncludeRegexLine: ^[ 	]*#[ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/jzhoulon/workspace/alg/benchmark/sort/sort_bench.cpp
+sort.hpp
+/home/jzhoulon/workspace/alg/benchmark/sort/sort.hpp
+

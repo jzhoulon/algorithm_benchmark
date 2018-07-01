@@ -1,0 +1,1 @@
+/usr/bin/c++   -g -std=c++11 -fopenmp -pie -fPIE -lboost_program_options -O2 -DNDEBUG -O3 -DNDEBUG   CMakeFiles/sort_bench.dir/sort/sort_bench.cpp.o  -o sort_bench -rdynamic 

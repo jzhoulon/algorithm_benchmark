@@ -18,6 +18,9 @@ enum Algo {
  bubbleSort,
  cocktailSort,
  chooseSort,
+ topMergeSort,
+ bottomMergeSort,
+ quickSort,
 };
 
  int* insertSortFunc();
@@ -25,6 +28,9 @@ enum Algo {
  int* bubbleSortFunc();
  int* cocktailSortFunc();
  int* chooseSortFunc();
+ int* topMergeSortFunc();
+ int* bottomMergeSortFunc();
+ int* quickSortFunc();
  void generateRandom();
  void resetData();
  void setDataLen(int length);
@@ -141,7 +147,6 @@ int* SortAlgo::cocktailSortFunc() {
         flag = true;
       }
     }
-
     for(int i = end -1; i > start; i--) {
       if(data[i]< data[i -1 ]) {
         tmp = data[i-1];
@@ -172,7 +177,85 @@ int* SortAlgo::chooseSortFunc() {
   }
 }
 
+void mergeArray(int a[], int first, int mid, int last, int tmp[]) {
+   int i  =  first;
+   int j = mid+1;
+   int k = 0;
+   while(i <=mid && j <=last){
+     if (a[i] < a[j])
+       tmp[k++] = a[i++];
+     else
+       tmp[k++] = a[j++];
+   }
+   while(i<=mid)
+     tmp[k++] = a[i++];
+   while(j<=last) 
+     tmp[k++] = a[j++];
+   memcpy(a+first, tmp, (last - first+1)*sizeof(a[0]));
+}
 
+void mergeSortImpl(int a[], int first, int last, int tmp[]) {
+  int mid = (first+last)/2 ;
+  if (first>=last)
+    return;
+  mergeSortImpl(a, first, mid, tmp);
+  mergeSortImpl(a, mid+1, last, tmp);
+  mergeArray(a, first, mid, last, tmp);
+  return;
+}
+
+
+
+int* SortAlgo::topMergeSortFunc() {
+  int *p = new int[len];
+  mergeSortImpl(data, 0, len -1, p);
+  delete[] p;
+}
+
+int* SortAlgo::bottomMergeSortFunc() {
+ int *tmp = new int[len];
+ for (int width = 1; width < len; width = width*2) {
+  for(int i = 0; i < len; i += width*2) {
+    int low = i;
+    int mid = low+width -1;
+    int high = mid + width > len-1? len-1:mid + width;
+    mergeArray(data, low, mid, high, tmp+low);
+  }
+ }
+ delete [] tmp;
+}
+
+
+int partition(int a[], int low, int high) {
+  int pivot = a[low];
+  int tmp;
+  int i = high;
+  for (int j = high; j >low; j--) {
+    if (a[j]>pivot) {
+      tmp = a[i];
+      a[i] = a[j];
+      a[j] = tmp;
+      i--;
+    }
+  }
+
+  if (a[low] >a[i]) {
+    tmp = a[i];
+    a[i] = a[low];
+    a[low] = tmp;
+  }
+}
+void quickSortImpl(int a[], int low, int high) {
+  if (low>=high)
+    return;
+  int p = partition(a, low, high);
+  quickSortImpl(a, low, p);
+  quickSortImpl(a, p+1, high);
+}
+
+int* SortAlgo::quickSortFunc() {
+  quickSortImpl(data, 0, len-1);
+}
 
 string SortAlgo::getAlgoName(Algo algo) {
   string name;
@@ -191,6 +274,15 @@ string SortAlgo::getAlgoName(Algo algo) {
     break;
   case Algo::chooseSort:
     name = "chooseSort";
+    break;
+  case Algo::topMergeSort:
+    name = "topMergeSort";
+    break;
+  case Algo::bottomMergeSort:
+    name = "bottomMergeSort";
+    break;
+  case Algo::quickSort:
+    name = "quickSort";
     break;
   default:
 	  std::cout << "not supported name" << std::endl;
@@ -217,6 +309,15 @@ void SortAlgo::benchmark(Algo algo) {
     break;
   case Algo::chooseSort:
     chooseSortFunc();
+    break;
+  case Algo::topMergeSort:
+    topMergeSortFunc();
+    break;
+  case Algo::bottomMergeSort:
+    bottomMergeSortFunc();
+    break;
+  case Algo::quickSort:
+    quickSortFunc();
     break;
   default:
      std::cout<<"not support yet!!" << std::endl;
@@ -253,10 +354,15 @@ int main(int argc, char **argv)
   s.generateRandom();
   if (isCheckAccuracy)
     s.printContent();
+#if 0
   s.benchmark(SortAlgo::Algo::insertSort);
   s.benchmark(SortAlgo::Algo::insertSortDichotomy);
   s.benchmark(SortAlgo::Algo::bubbleSort);
   s.benchmark(SortAlgo::Algo::cocktailSort);
   s.benchmark(SortAlgo::Algo::chooseSort);
-  return 0;
+  s.benchmark(SortAlgo::Algo::topMergeSort);
+#endif
+  s.benchmark(SortAlgo::Algo::bottomMergeSort);
+  s.benchmark(SortAlgo::Algo::quickSort);
+  return 1;
 }

@@ -3,7 +3,7 @@
 #include <functional>
 #include <chrono>
 #include <string.h>
-
+#include <algorithm>
 using namespace std;
 
 bool isCheckAccuracy;
@@ -21,6 +21,8 @@ enum Algo {
  topMergeSort,
  bottomMergeSort,
  quickSort,
+ std_quickSort,
+ bucketSort,
 };
 
  int* insertSortFunc();
@@ -31,6 +33,8 @@ enum Algo {
  int* topMergeSortFunc();
  int* bottomMergeSortFunc();
  int* quickSortFunc();
+ int* std_quickSortFunc();
+ int* bucketSortFunc();
  void generateRandom();
  void resetData();
  void setDataLen(int length);
@@ -42,6 +46,7 @@ private:
  int* data_orig;
  int* data;
  int len;
+ int seedLimit;
 };
 
 
@@ -59,11 +64,12 @@ void SortAlgo::setDataLen(int length) {
   this->data_orig = new int[length];
   this->data = new int[length];
   this->len = length;
+  this->seedLimit = 1000;
 }
 
 void SortAlgo::generateRandom() {
   std::default_random_engine generator;
-  std::uniform_int_distribution<int> dis(0, 1000);
+  std::uniform_int_distribution<int> dis(0, seedLimit);
   auto random = std::bind(dis, generator);
   for (int i=0; i < len; i++) {
     this->data_orig[i] = random();
@@ -238,24 +244,41 @@ int partition(int a[], int low, int high) {
       i--;
     }
   }
-
-  if (a[low] >a[i]) {
-    tmp = a[i];
-    a[i] = a[low];
-    a[low] = tmp;
-  }
+  tmp = a[i];
+  a[i] = a[low];
+  a[low] = tmp;
+  return i;
 }
 void quickSortImpl(int a[], int low, int high) {
-  if (low>=high)
+  if (high-low < 1) {
     return;
+  }
   int p = partition(a, low, high);
-  quickSortImpl(a, low, p);
+  quickSortImpl(a, low, p-1);
   quickSortImpl(a, p+1, high);
 }
 
 int* SortAlgo::quickSortFunc() {
   quickSortImpl(data, 0, len-1);
 }
+
+int* SortAlgo::std_quickSortFunc() {
+  std::sort(data, data+len);
+}
+
+int* SortAlgo::bucketSortFunc() {
+  int* bucket = new int[seedLimit+1];
+  memset(bucket, 0, seedLimit);
+  for (int i = 0; i< len; i++)
+      bucket[data[i]]++;
+  int j = 0;
+  for (int i = 0; i <=seedLimit; i++)
+    while(bucket[i]>0){
+      data[j++] = i;
+      bucket[i]--;
+    }
+}
+
 
 string SortAlgo::getAlgoName(Algo algo) {
   string name;
@@ -283,6 +306,12 @@ string SortAlgo::getAlgoName(Algo algo) {
     break;
   case Algo::quickSort:
     name = "quickSort";
+    break;
+  case Algo::std_quickSort:
+    name = "std_quickSort";
+    break;
+  case Algo::bucketSort:
+    name = "bucketSort";
     break;
   default:
 	  std::cout << "not supported name" << std::endl;
@@ -318,6 +347,12 @@ void SortAlgo::benchmark(Algo algo) {
     break;
   case Algo::quickSort:
     quickSortFunc();
+    break;
+  case Algo::std_quickSort:
+    std_quickSortFunc();
+    break;
+  case Algo::bucketSort:
+    bucketSortFunc();
     break;
   default:
      std::cout<<"not support yet!!" << std::endl;
@@ -364,5 +399,7 @@ int main(int argc, char **argv)
 #endif
   s.benchmark(SortAlgo::Algo::bottomMergeSort);
   s.benchmark(SortAlgo::Algo::quickSort);
+  s.benchmark(SortAlgo::Algo::std_quickSort);
+  s.benchmark(SortAlgo::Algo::bucketSort);
   return 1;
 }

@@ -356,7 +356,6 @@ void SortAlgo::benchmark(Algo algo) {
     break;
   default:
      std::cout<<"not support yet!!" << std::endl;
-  
   }
   auto t_e = std::chrono::high_resolution_clock::now();
   std::cout << getAlgoName(algo) << "time:" <<

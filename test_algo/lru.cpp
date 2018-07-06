@@ -121,7 +121,7 @@ class LRUCache {
 
 class LRUCache2 {
   int capacity_;
-  std::list<Node*> nodeList;
+  std::list<Node*> nodeList_;
   map<int, Node*> nodeMap_;
 public:
   LRUCache2(int capacity) {
@@ -133,17 +133,18 @@ public:
       return -1;
     }
     int value = nodeMap_.find(key)->second->value;  
-    nodeList.remove(nodeMap_.find(key));
-    nodeList.push_front(nodeMap_.find(key));
+    nodeList_.remove(nodeMap_.find(key)->second);
+    nodeList_.push_front(nodeMap_.find(key)->second);
   }
   
   void put(int key, int value) {
     if (nodeMap_.find(key) != nodeMap_.end()) {
       Node* n = nodeMap_.find(key)->second;
-      nodeList.remove(n);
-      nodeList.push_front(n);
+      nodeList_.remove(n);
+      nodeList_.push_front(n);
+      return;
     }
-    if (nodeList.size == capacity_) {
+    if (nodeList_.size() == capacity_) {
       Node* n_last =  nodeList_.back();
       nodeList_.pop_back();
       int key = n_last->key;
@@ -151,7 +152,7 @@ public:
     }
     Node* n = new Node(key, value);
     nodeList_.push_front(n);
-    nodeMap_[key] = value;
+    nodeMap_[key] = n;
   }
 
   ~LRUCache2() {
@@ -173,14 +174,31 @@ public:
 
  int main() {
   LRUCache *c = new LRUCache(3); 
-  c->put(1, 3);
+  c->put(1, 1);
   c->dumpCacheContent();
-  c->put(2, 3);
+  c->put(2, 2);
   c->dumpCacheContent();
-  c->put(3, 4);
+  c->put(3, 3);
   c->dumpCacheContent();
   c->put(4, 4);
   c->dumpCacheContent();
-  c->put(3, 4);
+  c->put(3, 3);
   c->dumpCacheContent();
+  c->put(5, 5);
+  c->dumpCacheContent();
+
+
+  LRUCache2 *c2 = new LRUCache2(3); 
+  c2->put(1, 1);
+  c2->dumpCacheContent();
+  c2->put(2, 2);
+  c2->dumpCacheContent();
+  c2->put(3, 3);
+  c2->dumpCacheContent();
+  c2->put(4, 4);
+  c2->dumpCacheContent();
+  c2->put(3, 3);
+  c2->dumpCacheContent();
+  c2->put(5, 5);
+  c2->dumpCacheContent();
  }
